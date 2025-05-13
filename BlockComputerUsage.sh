@@ -14,7 +14,7 @@
 #
 
 # Initialize.
-main_user="charles"
+main_user="christensen"
 echo "Starting BlockComputerUsage.sh on `date` as `whoami`..." > /Library/Logs/BlockComputerUsage.log
 echo " " >> /Library/Logs/BlockComputerUsage.log
 run_hourly=0
@@ -27,8 +27,8 @@ do
     tm=$(date +%H%M)
 
     # Prevent night-time computer usage.
-    # blocks:  <9:45am                    >2pm              any Saturday              any Sunday
-    if (( 10#$tm < 945 )) || (( 10#$tm >= 1400 )) || [ $dow == "Saturday" ] || [ $dow == "Sunday" ]
+    # blocks:    <9:30am                  >5pm              any Saturday              any Sunday
+    if (( 10#$tm < 930 )) || (( 10#$tm >= 1700 )) || [ $dow == "Saturday" ] || [ $dow == "Sunday" ]
     then
         echo "> Shutting down." >> /Library/Logs/BlockComputerUsage.log
         shutdown -h now  >> /Library/Logs/BlockComputerUsage.log
@@ -38,8 +38,8 @@ do
     [[ $0 = /* ]] && fullpath=$0 || fullpath=$PWD/${0#./}
     chflags schg $fullpath
     chflags uchg $fullpath
-    chflags schg /Library/LaunchDaemons/com.user.BlockComputerUsage.plist
-    chflags uchg /Library/LaunchDaemons/com.user.BlockComputerUsage.plist
+    chflags schg /Library/LaunchDaemons/com.charlesrc019.BlockComputerUsage.plist
+    chflags uchg /Library/LaunchDaemons/com.charlesrc019.BlockComputerUsage.plist
     chflags schg /etc/sudoers
     chflags uchg /etc/sudoers
 
@@ -103,8 +103,8 @@ do
             chflags nouchg /etc/hosts
             rm /etc/hosts
         fi
-        cp /Library/Scripts/User/hosts_cache.txt /etc/hosts
-        cat /Library/Scripts/User/hosts_custom.txt >> /etc/hosts
+        cp /Library/Scripts/charlesrc019/hosts_cache.txt /etc/hosts
+        cat /Library/Scripts/charlesrc019/hosts_custom.txt >> /etc/hosts
         chown root:wheel /etc/hosts
         chmod 644 /etc/hosts
         killall -HUP mDNSResponder
@@ -182,8 +182,8 @@ do
                 chflags nouchg /etc/hosts
                 rm /etc/hosts
             fi
-            cp /Library/Scripts/User/hosts_cache.txt /etc/hosts
-            cat /Library/Scripts/User/hosts_custom.txt >> /etc/hosts
+            cp /Library/Scripts/charlesrc019/hosts_cache.txt /etc/hosts
+            cat /Library/Scripts/charlesrc019/hosts_custom.txt >> /etc/hosts
             chown root:wheel /etc/hosts
             chmod 644 /etc/hosts
             killall -HUP mDNSResponder
