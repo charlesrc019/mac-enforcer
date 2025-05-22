@@ -27,8 +27,8 @@ do
     tm=$(date +%H%M)
 
     # Prevent night-time computer usage.
-    # blocks:    <9:30am                  >5pm              any Saturday              any Sunday
-    if (( 10#$tm < 930 )) || (( 10#$tm >= 1700 )) || [ $dow == "Saturday" ] || [ $dow == "Sunday" ]
+    # blocks:    < 6am                 >= 1159pm   #          any Saturday              any Sunday
+    if (( 10#$tm < 600 )) || (( 10#$tm >= 2359 ))  #|| [ $dow == "Saturday" ] || [ $dow == "Sunday" ]
     then
         echo "> Shutting down." >> /Library/Logs/BlockComputerUsage.log
         shutdown -h now  >> /Library/Logs/BlockComputerUsage.log
@@ -108,6 +108,8 @@ do
         chown root:wheel /etc/hosts
         chmod 644 /etc/hosts
         killall -HUP mDNSResponder
+        chflags schg /etc/hosts
+        chflags uchg /etc/hosts
     fi
 
     # Prevent use of Safari or Directory Utility.
@@ -187,6 +189,8 @@ do
             chown root:wheel /etc/hosts
             chmod 644 /etc/hosts
             killall -HUP mDNSResponder
+            chflags schg /etc/hosts
+            chflags uchg /etc/hosts
             echo "> + Complete!" >> /Library/Logs/BlockComputerUsage.log
         fi
 
