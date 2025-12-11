@@ -30,7 +30,7 @@ if [[ "$dow" == "Sunday" ]] || \
  ( [[ "$dow" == "Saturday"  ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) )
 then
     echo "> !!! Shutting down." >> /Library/Logs/MonitorComputerUsage.log
-    #shutdown -h now  >> /Library/Logs/MonitorComputerUsage.log
+    shutdown -h now  >> /Library/Logs/MonitorComputerUsage.log
 fi
 
 # Prevent user from modifying this file, its startup, or hosts.
@@ -40,8 +40,6 @@ chflags schg $fullpath
 chflags uchg $fullpath
 chflags schg /etc/hosts
 chflags uchg /etc/hosts
-chflags schg /etc/sudoers
-chflags uchg /etc/sudoers
 
 # Prevent extra users.
 echo "> Checking user accounts..." >> /Library/Logs/MonitorComputerUsage.log
@@ -94,31 +92,6 @@ then
     fi
 fi
 
-# Prevent unmonitored hosts.
-echo "> Checking hosts file..." >> /Library/Logs/MonitorComputerUsage.log
-tmp1=0
-if [[ -f /etc/hosts ]]
-then
-    tmp1=$(wc -l /etc/hosts | awk '{print $1}')
-fi
-if (( 10#$tmp1 < 100 ))
-then
-    echo "> Replacing blank hosts file." >> /Library/Logs/MonitorComputerUsage.log
-    if [[ -f /etc/hosts ]]
-    then
-        chflags noschg /etc/hosts
-        chflags nouchg /etc/hosts
-        rm /etc/hosts
-    fi
-    cp /Library/Scripts/charlesrc019/hosts_cache.txt /etc/hosts
-    cat /Library/Scripts/charlesrc019/hosts_custom.txt >> /etc/hosts
-    chown root:wheel /etc/hosts
-    chmod 644 /etc/hosts
-    killall -HUP mDNSResponder
-    chflags schg /etc/hosts
-    chflags uchg /etc/hosts
-fi
-
 # Prevent use of browsers and Directory Utility.
 uid=$(id -u "$main_user")
 for app in "Directory Utility" \
@@ -163,9 +136,29 @@ security -q authorizationdb read system.services.directory > /tmp/system.service
 defaults write /tmp/system.services.directory.plist group wheel > /dev/null
 security -q authorizationdb write system.services.directory < /tmp/system.services.directory.plist
 
-# Flush the DNS cache.
-echo "> Flushing the DNS cache..." >> /Library/Logs/MonitorComputerUsage.log
-killall -HUP mDNSResponder
+# Prevent unmonitored hosts.
+echo "> Checking hosts file..." >> /Library/Logs/MonitorComputerUsage.log
+tmp1=0
+if [[ -f /etc/hosts ]]
+then
+    tmp1=$(wc -l /etc/hosts | awk '{print $1}')
+fi
+if (( 10#$tmp1 < 100 ))
+then
+    echo "> Replacing blank hosts file." >> /Library/Logs/MonitorComputerUsage.log
+    if [[ -f /etc/hosts ]]
+    then
+        chflags noschg /etc/hosts
+        chflags nouchg /etc/hosts
+        rm /etc/hosts
+    fi
+    cp /Library/Scripts/mac-enforcer/hosts_cache.txt /etc/hosts
+    cat /Library/Scripts/mac-enforcer/hosts_custom.txt >> /etc/hosts
+    chown root:wheel /etc/hosts
+    chmod 644 /etc/hosts
+    chflags schg /etc/hosts
+    chflags uchg /etc/hosts
+fi
 
 # Refresh hosts.
 if [[ "$dow" == "Monday" ]] && (( 10#$tm < 1200 ))
@@ -177,13 +170,16 @@ then
         chflags nouchg /etc/hosts
         rm /etc/hosts
     fi
-    cp /Library/Scripts/charlesrc019/hosts_cache.txt /etc/hosts
-    cat /Library/Scripts/charlesrc019/hosts_custom.txt >> /etc/hosts
+    cp /Library/Scripts/mac-enforcer/hosts_cache.txt /etc/hosts
+    cat /Library/Scripts/mac-enforcer/hosts_custom.txt >> /etc/hosts
     chown root:wheel /etc/hosts
     chmod 644 /etc/hosts
-    killall -HUP mDNSResponder
     chflags schg /etc/hosts
     chflags uchg /etc/hosts
 fi
+
+# Flush the DNS cache.
+echo "> Flushing the DNS cache..." >> /Library/Logs/MonitorComputerUsage.log
+killall -HUP mDNSResponder
 
 echo "All complete!" >> /Library/Logs/MonitorComputerUsage.log
