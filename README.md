@@ -1,6 +1,6 @@
 # Mac Usage Enforcer
 ### Script Overview
-`BlockComputerUsage.sh` is a macOS script designed to monitor and restrict user access, system changes, and certain applications. It runs as a root LaunchDaemon and enforces configurable time-based access limitations, user restrictions, file integrity enforcement, and network security measures to ensure the system remains secure and controlled.
+`mac-enforcer.sh` is a macOS script designed to monitor and restrict user access, system changes, and certain applications. It runs as a root LaunchDaemon and enforces configurable time-based access limitations, user restrictions, file integrity enforcement, and network security measures to ensure the system remains secure and controlled.
 
 ### Features
 1. **Time-Based Access Control**:
@@ -31,15 +31,15 @@
 
 ### Installation Instructions
 1. **Add as a LaunchDaemon**:
-   - Place the script in a desired directory (e.g., `/Library/Scripts/BlockComputerUsage.sh`).
-   - Set up a LaunchDaemon plist (`/Library/LaunchDaemons/com.user.BlockComputerUsage.plist`) to run the script automatically at startup as root.
+   - Place the script in a desired directory (e.g., `/Library/Scripts/mac-enforcer.sh`).
+   - Set up a LaunchDaemon plist (`/Library/LaunchDaemons/com.user.mac-enforcer.plist`) to run the script automatically at startup as root.
    - Ensure that key administrative commands such as `chflags`, `killall`, `su`, and `visudo` are restricted to prevent circumvention.
 
 2. **Configuration**:
    - Modify the `main_user` variable at the beginning of the script to specify the primary user who will have authorized access.
 
 3. **Enable Logging**:
-   - The script logs actions and events to `/Library/Logs/BlockComputerUsage.log`. Ensure the directory is writable by the root user.
+   - The script logs actions and events to `/Library/Logs/mac-enforcer.log`. Ensure the directory is writable by the root user.
 
 ### Usage Notes
 - To disable the script, remove the associated LaunchDaemon plist file and adjust the `chflags` settings on the script file.

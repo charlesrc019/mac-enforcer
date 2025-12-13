@@ -18,5 +18,5 @@
 #
 #  --------------------------------------------------------------------------------------------------
 #
-   */5 * * * *   /Library/Scripts/charlesrc019/MonitorComputerUsage.sh
-   @reboot       /Library/Scripts/charlesrc019/MonitorComputerUsage.sh
+   */5 * * * *   /Library/Scripts/mac-enforcer/cron/mac-enforcer.sh
+   @reboot       /Library/Scripts/mac-enforcer/cron/mac-enforcer.sh

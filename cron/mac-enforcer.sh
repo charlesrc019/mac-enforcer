@@ -15,12 +15,12 @@
 # Initialize.
 main_user="charleschristensen"
 admin_user="bmrclinicaladmin"
-echo "Running MonitorComputerUsage.sh on $(date) as $(whoami)..." > /Library/Logs/MonitorComputerUsage.log
+echo "Running mac-enforcer.sh on $(date) as $(whoami)..." > /Library/Logs/mac-enforcer.log
 dow=$(date +%A)
 tm=$(date +%H%M)
 
 # Prevent night-time computer usage.
-echo "> Checking time of day..." >> /Library/Logs/MonitorComputerUsage.log
+echo "> Checking time of day..." >> /Library/Logs/mac-enforcer.log
 if [[ "$dow" == "Sunday" ]] || \
  ( [[ "$dow" == "Monday"    ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) ) || \
  ( [[ "$dow" == "Tuesday"   ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) ) || \
@@ -29,20 +29,20 @@ if [[ "$dow" == "Sunday" ]] || \
  ( [[ "$dow" == "Friday"    ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) ) || \
  ( [[ "$dow" == "Saturday"  ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) )
 then
-    echo "> !!! Shutting down." >> /Library/Logs/MonitorComputerUsage.log
-    shutdown -h now  >> /Library/Logs/MonitorComputerUsage.log
+    echo "> + Shutting down." >> /Library/Logs/mac-enforcer.log
+    shutdown -h now  >> /Library/Logs/mac-enforcer.log
 fi
 
 # Prevent user from modifying this file, its startup, or hosts.
 [[ $0 = /* ]] && fullpath=$0 || fullpath=$PWD/${0#./}
-echo "> Preventing file modifications..." >> /Library/Logs/MonitorComputerUsage.log
+echo "> Preventing file modifications..." >> /Library/Logs/mac-enforcer.log
 chflags schg $fullpath
 chflags uchg $fullpath
 chflags schg /etc/hosts
 chflags uchg /etc/hosts
 
 # Prevent extra users.
-echo "> Checking user accounts..." >> /Library/Logs/MonitorComputerUsage.log
+echo "> Checking user accounts..." >> /Library/Logs/mac-enforcer.log
 dscl . list /Users | grep -v "^_" | while read -r line
 do
     if [[ "$line" != $main_user  ]] &&
@@ -51,8 +51,8 @@ do
        [[ "$line" != "nobody"    ]] &&
        [[ "$line" != "root"      ]]
     then
-        echo "> !!! Deleting user '$line'." >> /Library/Logs/MonitorComputerUsage.log
-        dscl . -delete /Users/$line >> /Library/Logs/MonitorComputerUsage.log
+        echo "> + Deleting user '$line'." >> /Library/Logs/mac-enforcer.log
+        dscl . -delete /Users/$line >> /Library/Logs/mac-enforcer.log
     fi
 done
 ls /Users | while read -r line
@@ -62,31 +62,31 @@ do
        [[ "$line" != "Shared"     ]] &&
        [[ "$line" != ".localized" ]]
     then
-        echo "> !!! Deleting user folder '$line'." >> /Library/Logs/MonitorComputerUsage.log
-        rm -rf /Users/$line >> /Library/Logs/MonitorComputerUsage.log
+        echo "> + Deleting user folder '$line'." >> /Library/Logs/mac-enforcer.log
+        rm -rf /Users/$line >> /Library/Logs/mac-enforcer.log
     fi
 done
 
 # Prevent enabling root user.
-echo "> Disabling root user..." >> /Library/Logs/MonitorComputerUsage.log
+echo "> Disabling root user..." >> /Library/Logs/mac-enforcer.log
 dscl . delete /Users/root AuthenticationAuthority
 dscl . -create /Users/root UserShell /usr/bin/false
 dscl . -create /Users/root Password '*'
 
 # Prevent unmonitored DNS. (Lock to CleanBrowsing Family.)
-echo "> Checking DNS..." >> /Library/Logs/MonitorComputerUsage.log
+echo "> Checking DNS..." >> /Library/Logs/mac-enforcer.log
 tmp1=$(scutil --dns | grep nameserver | grep -c -e 185.228.168.168 -e 127.0.0.1)
 tmp2=$(scutil --dns | grep nameserver | grep -c -e 185.228.169.168 -e 127.0.0.1)
 tmp3=$(scutil --dns | grep -c nameserver)
 if (( 10#$tmp1 < 2 )) || (( 10#$tmp2 < 2 )) || (( 10#$tmp3 > 4 ))
 then
-    echo "> !!! DNS reset needed." >> /Library/Logs/MonitorComputerUsage.log
+    echo "> + DNS reset needed." >> /Library/Logs/mac-enforcer.log
     captive_test=$(curl -s -I http://captive.apple.com 2>/dev/null | head -n 1 | awk '{print $2}' | tr -d '\r')
     if [[ "$captive_test" != "200" ]]
     then
-        echo "> !!! Captive portal detected. Skipping DNS reset." >> /Library/Logs/MonitorComputerUsage.log
+        echo "> + Captive portal detected. Skipping DNS reset." >> /Library/Logs/mac-enforcer.log
     else
-        echo "> Resetting DNS servers." >> /Library/Logs/MonitorComputerUsage.log
+        echo "> Resetting DNS servers." >> /Library/Logs/mac-enforcer.log
         networksetup -setdnsservers Wi-Fi 185.228.168.168 185.228.169.168 2a0d:2a00:0001:0000:0000:0000:0000:0000 2a0d:2a00:0002:0000:0000:0000:0000:0000 > /dev/null
         networksetup -setdnsservers Ethernet 185.228.168.168 185.228.169.168 2a0d:2a00:0001:0000:0000:0000:0000:0000 2a0d:2a00:0002:0000:0000:0000:0000:0000 > /dev/null
     fi
@@ -115,7 +115,7 @@ do
 done
 
 # Lock settings modification.
-echo "> Locking system modifications..." >> /Library/Logs/MonitorComputerUsage.log
+echo "> Locking system modifications..." >> /Library/Logs/mac-enforcer.log
 
 security -q authorizationdb read system.preferences.accounts > /tmp/system.preferences.accounts.plist
 defaults write /tmp/system.preferences.accounts.plist group wheel > /dev/null
@@ -137,7 +137,7 @@ defaults write /tmp/system.services.directory.plist group wheel > /dev/null
 security -q authorizationdb write system.services.directory < /tmp/system.services.directory.plist
 
 # Prevent unmonitored hosts.
-echo "> Checking hosts file..." >> /Library/Logs/MonitorComputerUsage.log
+echo "> Checking hosts file..." >> /Library/Logs/mac-enforcer.log
 tmp1=0
 if [[ -f /etc/hosts ]]
 then
@@ -145,7 +145,7 @@ then
 fi
 if (( 10#$tmp1 < 100 ))
 then
-    echo "> Replacing blank hosts file." >> /Library/Logs/MonitorComputerUsage.log
+    echo "> Replacing blank hosts file." >> /Library/Logs/mac-enforcer.log
     if [[ -f /etc/hosts ]]
     then
         chflags noschg /etc/hosts
@@ -163,7 +163,7 @@ fi
 # Refresh hosts.
 if [[ "$dow" == "Monday" ]] && (( 10#$tm < 1200 ))
 then
-    echo "> Updating hosts file..." >> /Library/Logs/MonitorComputerUsage.log
+    echo "> Updating hosts file..." >> /Library/Logs/mac-enforcer.log
     if [[ -f /etc/hosts ]]
     then
         chflags noschg /etc/hosts
@@ -179,7 +179,7 @@ then
 fi
 
 # Flush the DNS cache.
-echo "> Flushing the DNS cache..." >> /Library/Logs/MonitorComputerUsage.log
+echo "> Flushing the DNS cache..." >> /Library/Logs/mac-enforcer.log
 killall -HUP mDNSResponder
 
-echo "All complete!" >> /Library/Logs/MonitorComputerUsage.log
+echo "All complete!" >> /Library/Logs/mac-enforcer.log

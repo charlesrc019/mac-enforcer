@@ -1,0 +1,4 @@
+Enter dates in the format MM-DD-YYYY to automatically "kill" on those days.
+- 01/01/2000 (example)
+- 01/01/2026
+- 12/12/2025

@@ -17,7 +17,7 @@
 # Initialize.
 main_user="charleschristensen"
 admin_user="bmrclinicaladmin"
-echo "Running MonitorComputerUsage.sh on $(date) as $(whoami)..."
+echo "Running mac-enforcer.sh on $(date) as $(whoami)..."
 
 # Prevent user from modifying  hosts.
 echo "> Preventing file modifications..."
@@ -34,7 +34,7 @@ do
        [[ "$line" != "nobody"    ]] &&
        [[ "$line" != "root"      ]]
     then
-        echo "> !!! Deleting user '$line'."
+        echo "> + Deleting user '$line'."
         dscl . -delete /Users/$line
     fi
 done
@@ -45,7 +45,7 @@ do
        [[ "$line" != "Shared"     ]] &&
        [[ "$line" != ".localized" ]]
     then
-        echo "> !!! Deleting user folder '$line'."
+        echo "> + Deleting user folder '$line'."
         rm -rf /Users/$line
     fi
 done

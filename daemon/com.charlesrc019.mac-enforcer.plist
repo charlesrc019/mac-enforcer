@@ -5,14 +5,17 @@
 <dict>
 
     <key>Label</key>
-    <string>com.charlesrc019.BlockComputerUsage</string>
+    <string>com.charlesrc019.mac-enforcer</string>
 
     <key>ProgramArguments</key>
     <array>
-        <string>/Library/Scripts/charlesrc019/BlockComputerUsage.sh</string>
+        <string>/Library/Scripts/mac-enforcer/daemon/mac-enforcer.sh</string>
     </array>
 
     <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
     <true/>
 
 </dict>

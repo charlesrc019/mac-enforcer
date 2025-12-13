@@ -548,13 +548,13 @@
 					bGwKZG9uZQo=
 					</data>
 					<key>filename</key>
-					<string>BlockComputerUsage</string>
+					<string>mac-enforcer</string>
 				</dict>
 			</array>
 		</dict>
 	</array>
 	<key>PayloadDisplayName</key>
-	<string>BlockComputerUsage</string>
+	<string>mac-enforcer</string>
 	<key>PayloadIdentifier</key>
 	<string>iMazing-Profile-Editor.0CE93BEC-7FB3-440D-B889-9DE0E1696531</string>
 	<key>PayloadOrganization</key>
