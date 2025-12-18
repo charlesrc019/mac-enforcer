@@ -15,21 +15,12 @@
 
 # Initialize.
 MAIN_USER="charlesrc019"
-ADMIN_USER="charles019"
+ADMIN_USER="admin"
 run_hourly=0
 run_once=0
 [[ $0 = /* ]] && fullpath=$0 || fullpath=$PWD/${0#./}
 echo "Starting $fullpath on $(date) as $(whoami)..." > /Library/Logs/mac-enforcer.log
 echo " " >> /Library/Logs/mac-enforcer.log
-
-# Kill switch check.
-echo "> Checking kill switch..." >> /Library/Logs/mac-enforcer.log
-today_date=$(date +%m/%d/%Y)
-if grep -q "$today_date" /Library/Scripts/mac-enforcer/kill_switch.txt
-then
-    echo "> + Kill switch activated for $today_date. Shutting down." >> /Library/Logs/mac-enforcer.log
-    shutdown -h now  >> /Library/Logs/mac-enforcer.log
-fi
 
 # Monitor tasks continuously.
 while true
@@ -38,7 +29,6 @@ do
     tm=$(date +%H%M)
 
     # Prevent night-time computer usage.
-    echo "> Checking time of day..." >> /Library/Logs/mac-enforcer.log
     if [[ "$dow" == "Sunday" ]] || \
     ( [[ "$dow" == "Monday"    ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) ) || \
     ( [[ "$dow" == "Tuesday"   ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) ) || \
@@ -47,15 +37,23 @@ do
     ( [[ "$dow" == "Friday"    ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) ) || \
     ( [[ "$dow" == "Saturday"  ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) )
     then
-        echo "> + Outside allowable time. Shutting down." >> /Library/Logs/mac-enforcer.log
+        echo "> Shutting down. (Outside allowable time.)" >> /Library/Logs/mac-enforcer.log
+        shutdown -h now  >> /Library/Logs/mac-enforcer.log
+    fi
+
+    # Kill switch check.
+    today_date=$(date +%m/%d/%Y)
+    if grep -q "$today_date" /Library/Scripts/mac-enforcer/kill_switch.txt
+    then
+        echo "> Shutting down. (Kill switch activated for $today_date.)" >> /Library/Logs/mac-enforcer.log
         shutdown -h now  >> /Library/Logs/mac-enforcer.log
     fi
 
     # Prevent user from modifying this file, its startup, or hosts.
     chflags schg "$fullpath"
     chflags uchg "$fullpath"
-    #chflags schg /Library/LaunchDaemons/com.charlesrc019.mac-enforcer.plist
-    #chflags uchg /Library/LaunchDaemons/com.charlesrc019.mac-enforcer.plist
+    chflags schg /Library/LaunchDaemons/com.charlesrc019.mac-enforcer.plist
+    chflags uchg /Library/LaunchDaemons/com.charlesrc019.mac-enforcer.plist
 
     # Prevent extra users.
     dscl . list /Users | grep -v "^_" | while read -r line
@@ -67,7 +65,7 @@ do
            [ "$line" != "root"        ]
         then
             echo "> Deleting user '$line'." >> /Library/Logs/mac-enforcer.log
-            #dscl . -delete /Users/"$line" >> /Library/Logs/mac-enforcer.log
+            dscl . -delete /Users/"$line" >> /Library/Logs/mac-enforcer.log
         fi
     done
 
@@ -80,7 +78,7 @@ do
            [ "$line" != ".localized"   ]
         then
             echo "> Deleting user folder '$line'." >> /Library/Logs/mac-enforcer.log
-            #rm -rf "/Users/$line" >> /Library/Logs/mac-enforcer.log
+            rm -rf "/Users/$line" >> /Library/Logs/mac-enforcer.log
         fi
     done
 
@@ -166,9 +164,9 @@ do
         echo "> Locking system modifications..." >> /Library/Logs/mac-enforcer.log
 
         # Prevent extra user creation.
-        #security -q authorizationdb read system.preferences.accounts > /tmp/system.preferences.accounts.plist
-        #defaults write /tmp/system.preferences.accounts.plist group wheel > /dev/null
-        #security -q authorizationdb write system.preferences.accounts < /tmp/system.preferences.accounts.plist
+        security -q authorizationdb read system.preferences.accounts > /tmp/system.preferences.accounts.plist
+        defaults write /tmp/system.preferences.accounts.plist group wheel > /dev/null
+        security -q authorizationdb write system.preferences.accounts < /tmp/system.preferences.accounts.plist
 
         # Prevent time modification.
         security -q authorizationdb read system.preferences.datetime > /tmp/system.preferences.datetime.plist
