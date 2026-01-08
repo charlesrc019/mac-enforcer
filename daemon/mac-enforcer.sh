@@ -38,7 +38,7 @@ do
     ( [[ "$dow" == "Saturday"  ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) )
     then
         echo "> Shutting down. (Outside allowable time.)" >> /Library/Logs/mac-enforcer.log
-        #shutdown -h now  >> /Library/Logs/mac-enforcer.log
+        shutdown -h now  >> /Library/Logs/mac-enforcer.log
     fi
 
     # Kill switch check.
