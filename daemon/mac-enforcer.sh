@@ -131,6 +131,7 @@ do
         cat /Library/Scripts/mac-enforcer/hosts_custom.txt >> /etc/hosts
         chown root:wheel /etc/hosts
         chmod 644 /etc/hosts
+        dscacheutil -flushcache
         killall -HUP mDNSResponder
         chflags schg /etc/hosts
         chflags uchg /etc/hosts
@@ -187,6 +188,7 @@ do
 
         # Flush the DNS cache.
         echo "> Flushing the DNS cache..." >> /Library/Logs/mac-enforcer.log
+        dscacheutil -flushcache
         killall -HUP mDNSResponder
         echo "> + Complete!" >> /Library/Logs/mac-enforcer.log
 
@@ -224,6 +226,7 @@ do
             cat /Library/Scripts/mac-enforcer/hosts_custom.txt >> /etc/hosts
             chown root:wheel /etc/hosts
             chmod 644 /etc/hosts
+            dscacheutil -flushcache
             killall -HUP mDNSResponder
             chflags schg /etc/hosts
             chflags uchg /etc/hosts
