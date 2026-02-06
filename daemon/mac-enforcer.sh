@@ -155,7 +155,23 @@ do
                "Puffin" \
                "Ghostery" \
                "SeaMonkey" \
-               "Slimjet"
+               "Slimjet" \
+               "Pale Moon" \
+               "Waterfox" \
+               "Qutebrowser" \
+               "Yandex Browser" \
+               "Dolphin Browser" \
+               "Kiwi Browser" \
+               "Naver Whale" \
+               "Brave Nightly" \
+               "Firefox Nightly" \
+               "Microsoft Edge Canary" \
+               "Opera Neon" \
+               "Vivaldi Snapshot" \
+               "Arc Beta" \
+               "UCBrowser Mini" \
+               "Maxthon Cloud Browser" \
+               "Samsung Internet Beta"
     do
         launchctl asuser $uid osascript -e "tell application \"$app\" to quit" > /dev/null
     done
