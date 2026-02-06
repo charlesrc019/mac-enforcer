@@ -29,13 +29,14 @@ do
     tm=$(date +%H%M)
 
     # Prevent night-time computer usage.
-    if [[ "$dow" == "Sunday" ]] || \
-    ( [[ "$dow" == "Monday"    ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) ) || \
-    ( [[ "$dow" == "Tuesday"   ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) ) || \
-    ( [[ "$dow" == "Wednesday" ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) ) || \
-    ( [[ "$dow" == "Thursday"  ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) ) || \
-    ( [[ "$dow" == "Friday"    ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) ) || \
-    ( [[ "$dow" == "Saturday"  ]] && ( ((10#$tm < 900)) || ((10#$tm >= 2130)) ) )
+    if \
+    ( [[ "$dow" == "Sunday"    ]] && ( ((10#$tm < 845)) || ((10#$tm >= 2130)) ) ) || \
+    ( [[ "$dow" == "Monday"    ]] && ( ((10#$tm < 845)) || ((10#$tm >= 2130)) ) ) || \
+    ( [[ "$dow" == "Tuesday"   ]] && ( ((10#$tm < 845)) || ((10#$tm >= 2130)) ) ) || \
+    ( [[ "$dow" == "Wednesday" ]] && ( ((10#$tm < 845)) || ((10#$tm >= 2130)) ) ) || \
+    ( [[ "$dow" == "Thursday"  ]] && ( ((10#$tm < 845)) || ((10#$tm >= 0130)) ) ) || \
+    ( [[ "$dow" == "Friday"    ]] && ( ((10#$tm < 845)) || ((10#$tm >= 2130)) ) ) || \
+    ( [[ "$dow" == "Saturday"  ]] && ( ((10#$tm < 845)) || ((10#$tm >= 2130)) ) )
     then
         echo "> Shutting down. (Outside allowable time.)" >> /Library/Logs/mac-enforcer.log
         shutdown -h now  >> /Library/Logs/mac-enforcer.log
