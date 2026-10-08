@@ -1,0 +1,19 @@
+Cmnd_Alias COMMANDS = \
+    /usr/sbin/arp, \
+    /usr/sbin/asr, \
+    /bin/dd, \
+    /usr/sbin/diskutil, \
+    /usr/bin/find, \
+    /sbin/fsck, \
+    /usr/sbin/lsof, \
+    /usr/bin/log, \
+    /sbin/mount, \
+    /sbin/newfs_apfs, \
+    /sbin/newfs_hfs, \
+    /usr/bin/pkill, \
+    /bin/ps, \
+    /sbin/route, \
+    /usr/sbin/tcpdump, \
+    /sbin/umount
+
+charlesrc019 ALL=(root) COMMANDS
