@@ -30,13 +30,15 @@ do
 
     # Prevent night-time computer usage.
     if \
-    ( [[ "$dow" == "Sunday"    ]] ) || \
-    ( [[ "$dow" == "Monday"    ]] && ( ((10#$tm < 0930)) || ((10#$tm >= 2100)) ) ) || \
+    #( [[ "$dow" == "Sunday"    ]] ) || \
+    #( [[ "$dow" == "Monday"    ]] && ( ((10#$tm < 0000)) || ((10#$tm >= 2100)) ) ) || \
+    ( [[ "$dow" == "Monday"    ]] && ( ((10#$tm >= 2100)) ) ) || \
     ( [[ "$dow" == "Tuesday"   ]] && ( ((10#$tm < 0930)) || ((10#$tm >= 2100)) ) ) || \
     ( [[ "$dow" == "Wednesday" ]] && ( ((10#$tm < 0930)) || ((10#$tm >= 2100)) ) ) || \
     ( [[ "$dow" == "Thursday"  ]] && ( ((10#$tm < 0930)) || ((10#$tm >= 2100)) ) ) || \
-    ( [[ "$dow" == "Friday"    ]] && ( ((10#$tm < 0930)) || ((10#$tm >= 2359)) ) ) || \
-    ( [[ "$dow" == "Saturday"  ]] && ( ((10#$tm < 1200)) || ((10#$tm >= 2359)) ) )
+    #( [[ "$dow" == "Friday"    ]] && ( ((10#$tm < 0930)) || ((10#$tm >= 2359)) ) ) || \
+    ( [[ "$dow" == "Friday"    ]] && ( ((10#$tm < 0930)) ) ) # || ((10#$tm >= 2359)) ) ) || \
+    #( [[ "$dow" == "Saturday"  ]] && ( ((10#$tm < 1200)) || ((10#$tm >= 2359)) ) )
     then
         echo "> Shutting down. (Outside allowable time.)" >> /Library/Logs/mac-enforcer.log
         shutdown -h now  >> /Library/Logs/mac-enforcer.log
@@ -49,12 +51,6 @@ do
         echo "> Shutting down. (Kill switch activated for $today_date.)" >> /Library/Logs/mac-enforcer.log
         shutdown -h now  >> /Library/Logs/mac-enforcer.log
     fi
-
-    # Prevent user from modifying this file, its startup, or hosts.
-    chflags schg "$fullpath"
-    chflags uchg "$fullpath"
-    chflags schg /Library/LaunchDaemons/com.charlesrc019.mac-enforcer.plist
-    chflags uchg /Library/LaunchDaemons/com.charlesrc019.mac-enforcer.plist
 
     # Prevent extra users.
     dscl . list /Users | grep -v "^_" | while read -r line
@@ -105,7 +101,7 @@ do
             echo "> + Captive portal detected. Clearing DNS reset." >> /Library/Logs/mac-enforcer.log
             networksetup -setdnsservers Wi-Fi Empty
             networksetup -setdnsservers Ethernet Empty
-            sleep 5 > /dev/null
+            sleep 10 > /dev/null
         else
             echo "> + Resetting DNS servers." >> /Library/Logs/mac-enforcer.log
             networksetup -setdnsservers Wi-Fi 185.228.168.168 185.228.169.168 2a0d:2a00:0001:0000:0000:0000:0000:0000 2a0d:2a00:0002:0000:0000:0000:0000:0000 > /dev/null
@@ -181,6 +177,7 @@ do
     then
         run_hourly=$tm
 
+        echo " " >> /Library/Logs/mac-enforcer.log
         echo "> Locking system modifications..." >> /Library/Logs/mac-enforcer.log
 
         # Prevent extra user creation.
@@ -201,6 +198,9 @@ do
         defaults write /tmp/system.services.directory.plist group wheel > /dev/null
         security -q authorizationdb write system.services.directory < /tmp/system.services.directory.plist
 
+        # Allow use of wifi diagnostics.
+        security authorizationdb write com.apple.wifidiagnostics allow
+
         echo "> + Complete!" >> /Library/Logs/mac-enforcer.log
 
         # Flush the DNS cache.
@@ -217,12 +217,19 @@ do
         echo "> + Complete!" >> /Library/Logs/mac-enforcer.log
 
         echo "> Hour $tm tasks complete!" >> /Library/Logs/mac-enforcer.log
+
     fi
 
     # Run one-time tasks.
     if [ "$run_once" == 0 ]
     then
         run_once=1
+
+        # Prevent user from modifying this file or its startup.
+        chflags schg "$fullpath"
+        chflags uchg "$fullpath"
+        chflags schg /Library/LaunchDaemons/com.charlesrc019.mac-enforcer.plist
+        chflags uchg /Library/LaunchDaemons/com.charlesrc019.mac-enforcer.plist
 
         # Update hosts.
         if [ -f /etc/hosts ]
